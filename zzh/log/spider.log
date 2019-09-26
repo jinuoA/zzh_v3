@@ -1,0 +1,9 @@
+[2019-09-26 15:08:39][spiderbase.py][line:75][INFO] ½Å±¾´íÎó:610100303xasfzhggwyh      http://xadrc.xa.gov.cn/xwzx/tzgg/1.html
+[2019-09-26 15:08:39][spiderbase.py][line:76][INFO] Traceback (most recent call last):
+  File "H:\spider_demo\zzh_v3\zzh\spiders\spiderbase.py", line 50, in parse
+    exec(func, self.global_namespace)
+  File "<string>", line 26
+    if title and url and de pt_name_key and dept_id:
+                                      ^
+SyntaxError: invalid syntax
+

@@ -1,0 +1,90 @@
+
+#! /usr/bin/env python
+#-*-coding:utf-8 -*-
+
+import redis
+import json
+
+strl = '''
+
+def parse_spider(response, dept_id, dept_name_key):
+    list_xpath = "//div[@class='list-info']/ul/li"
+    title_xpath = "a/text()"
+    url_xpath = "a/@href"
+    pdate_xpath = "span/text()"
+    content_xpath = ""
+    next_page_xpath = "//a[contains(text(),'下一页')]/@href"
+    next_filter = '0'
+    item_list = []
+    next_page_url = []
+    
+    try:
+        li = response.xpath(list_xpath)
+        if li:
+            for link in li:
+                title = link.xpath(title_xpath).extract_first()
+                url = response.urljoin(link.xpath(url_xpath).extract_first())
+                try:
+                    pdate = link.xpath(pdate_xpath).extract_first()
+                    pdate = get_publish_date(pdate)
+                except:
+                    pass
+                    pdate = ''
+                
+                dept_id = dept_id
+
+                if title and url and dept_name_key and dept_id:
+                    task_id = str(dept_id.encode('utf-8')) + str(title.encode('utf-8'))
+                    make_md5 = hashlib.md5()
+                    make_md5.update(task_id.encode("utf-8"))
+                    task_id = make_md5.hexdigest()
+                    item = {
+                        'item_title': title.strip(),
+                        'item_url': url,
+                        'task_id': task_id,
+                        'dept_id': dept_id,
+                        'item_pulishdate': pdate,
+                        'dept_name_key': dept_name_key,
+                        'content_xpath':content_xpath
+                    }
+                    item_list.append(item)
+                    #yield item
+        # 提取下一页
+        next_page_xpath = next_page_xpath.encode('utf-8')
+        try:
+
+            next_page_url = response.xpath(next_page_xpath.decode('utf-8')).extract()
+
+            #next_page_url = response.urljoin(next_page_url)
+            if next_page_url:
+                next_page_url = next_page_url
+
+        except:
+            pass
+
+            next_page_url = []
+    except:
+        pass
+
+    return item_list, next_page_url
+
+'''
+        
+data_list = [
+    {
+        "spider": "zzhbase",
+        "project": "zzh",
+        "dept_id": "2522",
+        "dept_name_key": f"450000103gxzzzzqwhhlyt_whsy",
+        "url": f"http://wlt.gxzf.gov.cn/zwgk/tzgg/index.shtml",
+        "func": strl,
+        "next_filter": '0'
+    }
+
+]
+        
+for data in data_list:
+    reminder_str = json.dumps(data)
+    r = redis.StrictRedis(host='192.168.5.127', port=6381, db=0)
+    print r.lpush('basescrawler:rules', reminder_str)
+        
